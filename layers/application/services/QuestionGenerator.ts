@@ -1,3 +1,5 @@
+import CategoryRepositoryImpl from "@/layers/data/repositories/categoryrepository";
+import PictureRepositoryImpl from "@/layers/data/repositories/picturerepository";
 import Picture from "@/layers/domain/entities/picture";
 import Question from "@/layers/domain/entities/question";
 import CategoryRepository from "@/layers/domain/repositories/categoryrepository";
@@ -7,7 +9,7 @@ import { QuestionGenerator } from "@/layers/domain/services/QuestionGenerator";
 class QuestionGeneratorClassError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "CategoryNotFoundError";
+    this.name = "QuestionGeneratorError";
   }
 }
 
@@ -15,20 +17,19 @@ export default class QuestionGeneratorImpl implements QuestionGenerator {
   private categoryRepo: CategoryRepository;
   private pictureRepo: PictureRepository;
 
-  constructor(
-    categoryRepo: CategoryRepository,
-    pictureRepo: PictureRepository,
-  ) {
-    this.categoryRepo = categoryRepo;
-    this.pictureRepo = pictureRepo;
+  constructor() {
+    this.categoryRepo = new CategoryRepositoryImpl();
+    this.pictureRepo = new PictureRepositoryImpl();
   }
 
-  async isCategoryAvailable(categoryId: number): Promise<boolean> {
+  private async isCategoryAvailable(categoryId: number): Promise<boolean> {
     const ids = await this.categoryRepo.getAllAvailableCategoryIds();
     return ids.includes(categoryId);
   }
 
-  async selectRandomIdFromCategory(categoryId: number): Promise<number> {
+  private async selectRandomIdFromCategory(
+    categoryId: number,
+  ): Promise<number> {
     const exists: boolean = await this.isCategoryAvailable(categoryId);
     if (!exists) {
       throw new QuestionGeneratorClassError(
@@ -36,7 +37,7 @@ export default class QuestionGeneratorImpl implements QuestionGenerator {
       );
     }
 
-    const categoryMemberIdList =
+    const categoryMemberIdList: number[] =
       await this.categoryRepo.getAllIdsInCategory(categoryId);
     if (categoryMemberIdList.length === 0) {
       throw new QuestionGeneratorClassError(
@@ -63,7 +64,7 @@ export default class QuestionGeneratorImpl implements QuestionGenerator {
       return pictures;
     };
 
-    const pictures = await generateRandomPictures();
+    const pictures: Picture[] = await generateRandomPictures();
 
     const correctPictureIndex: number = Math.floor(
       Math.random() * numberOfPossibleAnswers,

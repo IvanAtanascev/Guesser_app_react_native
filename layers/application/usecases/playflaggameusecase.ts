@@ -1,6 +1,7 @@
 import Question from "@/layers/domain/entities/question";
 import Picture from "@/layers/domain/entities/picture";
 import { QuestionGenerator } from "@/layers/domain/services/QuestionGenerator";
+import QuestionGeneratorImpl from "../services/QuestionGenerator";
 
 export default class PlayGameUseCase {
   private questionGenerator: QuestionGenerator;
@@ -8,14 +9,9 @@ export default class PlayGameUseCase {
   private categoryId: number;
   private numberOfPossibleAnswers: number;
 
-  constructor(
-    questionGenerator: QuestionGenerator,
-    initialQuestion: Question,
-    categoryId: number,
-    numberOfPossibleAnswers: number,
-  ) {
-    this.questionGenerator = questionGenerator;
-    this.currentQuestion = initialQuestion;
+  constructor(categoryId: number, numberOfPossibleAnswers: number) {
+    this.questionGenerator = new QuestionGeneratorImpl();
+    this.currentQuestion = new Question([], -1);
     this.categoryId = categoryId;
     this.numberOfPossibleAnswers = numberOfPossibleAnswers;
   }

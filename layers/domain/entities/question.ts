@@ -3,7 +3,7 @@ import Picture from "./picture";
 class QuestionClassError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "QuestionClassError"
+    this.name = "QuestionClassError";
   }
 }
 
@@ -13,14 +13,20 @@ export default class Question {
   private readonly questionString: string;
 
   constructor(pictures: Picture[], correctPictureIndex: number) {
-    if (pictures.length !== 4) {
+    if (pictures.length !== 4 && correctPictureIndex !== -1) {
       throw new QuestionClassError("doesn't have 4 pictures");
     }
-    if (correctPictureIndex < 0 || correctPictureIndex > 3) {
+    if (correctPictureIndex < -1 || correctPictureIndex > 3) {
       throw new QuestionClassError("correctPictureIndex out of range");
     }
     this.correctPictureIndex = correctPictureIndex;
-    this.questionString = `Which picture shows the flag of ${pictures[correctPictureIndex].getName()}`;
+    this.pictures = pictures;
+
+    if (correctPictureIndex === -1) {
+      this.questionString = ``;
+    } else {
+      this.questionString = `Which picture shows the flag of ${pictures[correctPictureIndex].getName()}`;
+    }
   }
 
   public getPictures(): Picture[] {
@@ -34,5 +40,4 @@ export default class Question {
   public isCorrect(index: number): boolean {
     return index === this.correctPictureIndex;
   }
-
 }

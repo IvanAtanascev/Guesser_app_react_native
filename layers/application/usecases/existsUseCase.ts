@@ -1,20 +1,14 @@
 import CategoryRepositoryImpl from "@/layers/data/repositories/categoryrepository";
 import CategoryRepository from "@/layers/domain/repositories/categoryrepository";
 
-export class DownloadCategoryUseCase {
+export class ExistsUseCase {
   private categoryRepo: CategoryRepository;
 
   constructor() {
     this.categoryRepo = new CategoryRepositoryImpl();
   }
 
-  public async execute(category: string, successCallback: () => void) {
-    try {
-      await this.categoryRepo.download(category);
-    } catch (error) {
-      throw new Error(`DownloadCategoryUseCase fail: ${error}`);
-    }
-
-    successCallback();
+  public async execute(id: number): Promise<boolean> {
+    return await this.categoryRepo.exists(id);
   }
 }
