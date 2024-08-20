@@ -10,14 +10,7 @@ import Picture from "@/layers/domain/entities/picture";
 import db from "../database";
 import { SQLiteDatabase } from "expo-sqlite";
 
-class PictureDataSourceError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "PictureDataSourceError";
-  }
-}
-
-class CategoryDataSourceError extends Error {
+class DataSourceError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "CategoryDataSourceError";
@@ -49,18 +42,25 @@ export default class DataSource {
       this.downloadPicture(picture.name, picture.url);
       console.log(picture.url);
     });
-    await Promise.all(downloadPromises);
+
+    try {
+      await Promise.all(downloadPromises);
+    } catch (error) {
+      throw new DataSourceError(`${error}`);
+    }
   }
 
   public async insertCategoryIntoDB(
     category: CategoryApiResponse,
   ): Promise<void> {
-    //await this.db.withTransactionAsync(async () => {
-    await this.db.runAsync(
-      `INSERT INTO ${categoryTableName} (id, name, date_of_last_change) VALUES(?, ?, ?)`,
-      [category.id, category.name, category.date_of_last_change],
-    );
-    //});
+    try {
+      await this.db.runAsync(
+        `INSERT INTO ${categoryTableName} (id, name, date_of_last_change) VALUES(?, ?, ?)`,
+        [category.id, category.name, category.date_of_last_change],
+      );
+    } catch (error) {
+      throw new DataSourceError(`${error}`);
+    }
 
     const dbPromises = category.pictures.map((picture) => {
       this.insertPictureInDB(
@@ -71,7 +71,11 @@ export default class DataSource {
       );
     });
 
-    await Promise.all(dbPromises);
+    try {
+      await Promise.all(dbPromises);
+    } catch (error) {
+      throw new DataSourceError(`${error}`);
+    }
   }
 
   public async getCategoryById(id: number): Promise<Category | null> {
@@ -151,13 +155,14 @@ export default class DataSource {
     localPath: string,
     categoryId: number,
   ): Promise<void> {
-    //await this.db.withTransactionAsync(async () => {
-    await this.db.runAsync(
-      `INSERT INTO ${picturesTableName} (id, name, localPath, category_id) VALUES (?, ?, ?, ?)`,
-      [id, name, localPath, categoryId],
-    );
-
-    //});
+    try {
+      await this.db.runAsync(
+        `INSERT INTO ${picturesTableName} (id, name, localPath, category_id) VALUES (?, ?, ?, ?)`,
+        [id, name, localPath, categoryId],
+      );
+    } catch (error) {
+      throw new DataSourceError(`${error}`);
+    }
   }
 
   public async getPictureById(id: number): Promise<Picture | null> {

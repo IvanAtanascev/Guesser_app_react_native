@@ -25,8 +25,22 @@ export default class CategoryRepositoryImpl implements CategoryRepository {
       await this.DataSource.fetchCategory(
         "https://guesser.ivanata.cz/categories/" + category,
       );
-    await this.DataSource.downloadAllCategoryFiles(categoryResponse);
-    await this.DataSource.insertCategoryIntoDB(categoryResponse);
+
+    try {
+      await this.DataSource.downloadAllCategoryFiles(categoryResponse);
+    } catch (error) {
+      throw new CategoryRepositoryClassError(
+        `Download all category files error: ${error}`,
+      );
+    }
+
+    try {
+      await this.DataSource.insertCategoryIntoDB(categoryResponse);
+    } catch (error) {
+      throw new CategoryRepositoryClassError(
+        `Insert category into DB error: ${error}`,
+      );
+    }
 
     return true;
   }

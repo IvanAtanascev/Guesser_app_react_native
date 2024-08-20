@@ -4,6 +4,13 @@ import { useEffect, useState, useMemo } from "react";
 import Picture from "../domain/entities/picture";
 import { SvgUri } from "react-native-svg";
 
+class GameComponentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GameComponentError";
+  }
+}
+
 export default function GameComponent({ categoryId }: { categoryId: number }) {
   const [question, setQuestion] = useState<string>("");
   const [pictures, setPictures] = useState<Picture[]>([]);
@@ -14,7 +21,11 @@ export default function GameComponent({ categoryId }: { categoryId: number }) {
   );
 
   const loadNewQuestion = async () => {
-    await playGame.generateNewQuestion();
+    try {
+      await playGame.generateNewQuestion();
+    } catch (error) {
+      throw new GameComponentError(`Couldn't generate a question: ${error}`);
+    }
     setQuestion(playGame.getCurrentQuestionString());
     setPictures(playGame.getPictures());
   };
