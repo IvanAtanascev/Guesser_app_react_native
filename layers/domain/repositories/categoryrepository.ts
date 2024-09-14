@@ -5,6 +5,8 @@ export default interface CategoryRepository {
   findById(id: number): Promise<Category>;
   findByName(name: string): Promise<Category>;
   getAllIdsInCategory(categoryId: number): Promise<number[]>;
+  getAllLocalCategories(): Promise<Category[]>;
+  getSingleLocalCategory(id: number): Promise<Category>;
   getAllAvailableCategoryIds(): Promise<number[]>;
   getAllCategoryInfo(): Promise<Category[]>;
   exists(id: number): Promise<boolean>;
