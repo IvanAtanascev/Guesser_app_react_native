@@ -70,8 +70,12 @@ export default class CategoryRepositoryImpl implements CategoryRepository {
     return category;
   }
 
-  public async getAllIdsInCategory(categoryId: number): Promise<number[]> {
-    return await this.DataSource.getAllIdsInCategory(categoryId);
+  public async getAllIdsInCategory(id: number): Promise<number[]> {
+    return await this.DataSource.getAllIdsInCategory(id);
+  }
+
+  public async getAllLocalCategories(): Promise<Category[]> {
+    return await this.DataSource.getAllLocalCategories();
   }
 
   public async getAllAvailableCategoryIds(): Promise<number[]> {
@@ -102,6 +106,19 @@ export default class CategoryRepositoryImpl implements CategoryRepository {
       return false;
     } else {
       return true;
+    }
+  }
+
+  public async getSingleLocalCategory(id: number): Promise<Category> {
+    const result: Category | null =
+      await this.DataSource.getSingleLocalCategory(id);
+
+    if (result === null) {
+      throw new CategoryRepositoryClassError(
+        `Couldn't find local category with number ${id}`,
+      );
+    } else {
+      return result;
     }
   }
 }

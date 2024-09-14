@@ -1,4 +1,8 @@
-import { picturesTableName, categoryTableName } from "./shared";
+import {
+  picturesTableName,
+  categoryTableName,
+  scoreBoardTableName,
+} from "./shared";
 import {
   CategoryApiResponse,
   CategoryInfoApiResponse,
@@ -39,8 +43,7 @@ export default class DataSource {
     categoryApiResponse: CategoryApiResponse,
   ): Promise<void> {
     const downloadPromises = categoryApiResponse.pictures.map((picture) => {
-      this.downloadPicture(picture.name, picture.url);
-      console.log(picture.url);
+      return this.downloadPicture(picture.name, picture.url);
     });
 
     try {
@@ -57,6 +60,10 @@ export default class DataSource {
       await this.db.runAsync(
         `INSERT INTO ${categoryTableName} (id, name, date_of_last_change) VALUES(?, ?, ?)`,
         [category.id, category.name, category.date_of_last_change],
+      );
+      await this.db.runAsync(
+        `INSERT INTO ${scoreBoardTableName} (category_id) VALUES(?)`,
+        [category.id],
       );
     } catch (error) {
       throw new DataSourceError(`${error}`);
@@ -126,6 +133,49 @@ export default class DataSource {
     });
 
     return idArray;
+  }
+
+  public async getAllLocalCategories(): Promise<Category[]> {
+    const allRows = await this.db.getAllAsync<{
+      id: number;
+      name: string;
+      date_of_last_change: string;
+    }>(`SELECT * FROM ${categoryTableName}`);
+
+    const categoryArray: Category[] = allRows.map(
+      (row: { id: number; name: string; date_of_last_change: string }) => {
+        const category: Category = new Category(
+          row.id,
+          row.name,
+          row.date_of_last_change,
+        );
+        return category;
+      },
+    );
+
+    return categoryArray;
+  }
+
+  public async getSingleLocalCategory(
+    categoryId: number,
+  ): Promise<Category | null> {
+    const row = await this.db.getFirstAsync<{
+      id: number;
+      name: string;
+      date_of_last_change: string;
+    }>(`SELECT * FROM ${categoryTableName} WHERE id = ?`, [categoryId]);
+
+    if (row === null) {
+      return null;
+    }
+
+    const category: Category = new Category(
+      row.id,
+      row.name,
+      row.date_of_last_change,
+    );
+
+    return category;
   }
 
   public async fetchCategoryInfo(): Promise<CategoryInfoApiResponse> {
@@ -232,5 +282,34 @@ export default class DataSource {
     });
 
     return idArray;
+  }
+
+  public async getScoreForCategory(categoryId: number): Promise<number | null> {
+    const row = await this.db.getFirstAsync<{
+      score: number;
+    }>(
+      `SELECT score FROM ${scoreBoardTableName} WHERE category_id = ?`,
+      categoryId,
+    );
+
+    if (row === null) {
+      return null;
+    }
+
+    console.log(row.score);
+
+    return row.score;
+  }
+
+  public async updateScore(
+    updateAmount: number,
+    categoryId: number,
+  ): Promise<void> {
+    console.log(updateAmount)
+    console.log(categoryId)
+    await db.runAsync(
+      `UPDATE ${scoreBoardTableName} SET score = ? WHERE category_id = ?`,
+      [updateAmount, categoryId],
+    );
   }
 }

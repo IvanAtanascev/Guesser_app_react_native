@@ -3,6 +3,7 @@ import {
   localDatabaseName,
   categoryTableName,
   picturesTableName,
+  scoreBoardTableName,
 } from "./datasources/shared";
 
 class DatabaseCreationError extends Error {
@@ -18,6 +19,17 @@ const createCategoryTable = (localDatabase: SQLite.SQLiteDatabase) => {
         id INTEGER PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
         date_of_last_change TEXT NOT NULL
+        )`,
+  );
+};
+
+const createScoreBoardTable = (localDatabase: SQLite.SQLiteDatabase) => {
+  localDatabase.execSync(
+    `CREATE TABLE IF NOT EXISTS ${scoreBoardTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category_id INTEGER NOT NULL unique,
+        score INTEGER DEFAULT 0,
+        FOREIGN KEY (category_id) REFERENCES ${categoryTableName}(id) on DELETE CASCADE
         )`,
   );
 };
@@ -38,6 +50,7 @@ function openDatabase(): SQLite.SQLiteDatabase {
   const db = SQLite.openDatabaseSync(localDatabaseName);
   db.withTransactionSync(() => {
     createCategoryTable(db);
+    createScoreBoardTable(db);
     createPictureTable(db);
   });
 
