@@ -8,13 +8,18 @@ export class DownloadCategoryUseCase {
     this.categoryRepo = new CategoryRepositoryImpl();
   }
 
-  public async execute(category: string, successCallback: () => void) {
+  public async execute(
+    category: string,
+    triggerCallback: () => void,
+    successCallback: () => void,
+  ) {
+    triggerCallback();
     try {
       await this.categoryRepo.download(category);
     } catch (error) {
       throw new Error(`DownloadCategoryUseCase fail: ${error}`);
+    } finally {
+      successCallback();
     }
-
-    successCallback();
   }
 }

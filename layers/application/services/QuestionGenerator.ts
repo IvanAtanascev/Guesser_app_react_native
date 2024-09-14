@@ -56,9 +56,18 @@ export default class QuestionGeneratorImpl implements QuestionGenerator {
   ): Promise<Question> {
     const generateRandomPictures = async () => {
       let pictures: Picture[] = [];
+      let ids: number[] = [];
+
       for (let i: number = 0; i < numberOfPossibleAnswers; i++) {
-        const pictureId = await this.selectRandomIdFromCategory(categoryId);
-        pictures[i] = await this.pictureRepo.findById(pictureId);
+        const pictureId: number =
+          await this.selectRandomIdFromCategory(categoryId);
+
+        if (!ids.includes(pictureId)) {
+          pictures[i] = await this.pictureRepo.findById(pictureId);
+          ids[i] = pictureId;
+        } else {
+          i--;
+        }
       }
 
       return pictures;
