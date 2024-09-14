@@ -21,5 +21,5 @@ export default function GamePage() {
 
   const categoryIdNumber = parseInt(categoryId);
 
-  return <GameComponent categoryId={categoryIdNumber} />;
+  return <GameComponent categoryId={categoryIdNumber} />
 }

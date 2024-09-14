@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Tabs, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -42,5 +42,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
-  return <Stack />;
+  return (
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Tabs>
+      <Tabs.Screen name="(index-stack)" options={{ title: "Categories", headerShown: false }} />
+        <Tabs.Screen name="scoreboard" options={{ title: "Score Board" }} />
+      </Tabs>
+    </ThemeProvider>
+  );
 }
