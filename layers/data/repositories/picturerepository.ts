@@ -38,4 +38,5 @@ export default class PictureRepositoryImpl implements PictureRepository {
 
     return pictures;
   }
+  
 }

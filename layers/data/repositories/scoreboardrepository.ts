@@ -40,4 +40,14 @@ export default class ScoreBoardRepositoryImpl implements ScoreBoardRepository {
       );
     }
   }
+
+  public async deleteScoreBoardEntry(categoryId: number): Promise<void> {
+    try {
+      await this.DataSource.deleteScoreBoardEntry(categoryId);
+    } catch (error) {
+      throw new ScoreBoardRepositoryClassError(
+        `Couldn't delete score ${error}`,
+      );
+    }
+  }
 }

@@ -83,6 +83,7 @@ export const CategoryDisplay = () => {
           );
 
           const compareResult = compareCategories.execute(item, localCategory);
+          console.log("here " + compareResult);
 
           if (compareResult === false) {
             existsResult = "update_available";
@@ -121,7 +122,7 @@ export const CategoryDisplay = () => {
 
     const handleDownload = () => {
       downloadUseCase.execute(
-        item.getName(),
+        item,
         () => {
           setExistenceMap((prevMap) => ({
             ...prevMap,
@@ -136,6 +137,8 @@ export const CategoryDisplay = () => {
         },
       );
     };
+
+    console.log("hi" + itemExists);
 
     return (
       <View
