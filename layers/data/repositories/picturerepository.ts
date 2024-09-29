@@ -38,5 +38,12 @@ export default class PictureRepositoryImpl implements PictureRepository {
 
     return pictures;
   }
-  
+
+  public async deleteAllInCategory(categoryId: number): Promise<void> {
+    try {
+      await this.DataSource.deletePicturesFromCategory(categoryId);
+    } catch (error) {
+      throw new PictureRepositoryError(`deleteAllInCategory error ${error}`);
+    }
+  }
 }

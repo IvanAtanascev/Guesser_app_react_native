@@ -93,6 +93,13 @@ export default class DataSource {
     );
   }
 
+  public async deletePicturesFromCategory(categoryId: number): Promise<void> {
+    await this.db.runAsync(
+      `DELETE FROM ${picturesTableName} WHERE category_id = ?`,
+      [categoryId],
+    );
+  }
+
   public async deleteScoreBoardEntry(categoryId: number): Promise<void> {
     await this.db.runAsync(
       `DELETE FROM ${scoreBoardTableName} WHERE category_id = ?`,
