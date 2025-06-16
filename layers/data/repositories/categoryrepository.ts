@@ -45,6 +45,14 @@ export default class CategoryRepositoryImpl implements CategoryRepository {
     return true;
   }
 
+  public async deleteCategory(name: string): Promise<void> {
+    try {
+      await this.DataSource.deleteCategory(name);
+    } catch (error) {
+      throw new CategoryRepositoryClassError(`Delete category: ${error}`);
+    }
+  }
+
   public async findById(id: number): Promise<Category> {
     const category: Category | null = await this.DataSource.getCategoryById(id);
 

@@ -13,6 +13,7 @@ import * as FileSystem from "expo-file-system";
 import Picture from "@/layers/domain/entities/picture";
 import db from "../database";
 import { SQLiteDatabase } from "expo-sqlite";
+import { fileNameToNameMap } from "./fileNameToName";
 
 class DataSourceError extends Error {
   constructor(message: string) {
@@ -83,6 +84,27 @@ export default class DataSource {
     } catch (error) {
       throw new DataSourceError(`${error}`);
     }
+  }
+
+  public async deleteCategory(name: string): Promise<void> {
+    await this.db.runAsync(
+      `DELETE FROM ${categoryTableName} WHERE name = ?`,
+      name,
+    );
+  }
+
+  public async deletePicturesFromCategory(categoryId: number): Promise<void> {
+    await this.db.runAsync(
+      `DELETE FROM ${picturesTableName} WHERE category_id = ?`,
+      [categoryId],
+    );
+  }
+
+  public async deleteScoreBoardEntry(categoryId: number): Promise<void> {
+    await this.db.runAsync(
+      `DELETE FROM ${scoreBoardTableName} WHERE category_id = ?`,
+      [categoryId],
+    );
   }
 
   public async getCategoryById(id: number): Promise<Category | null> {
@@ -305,8 +327,8 @@ export default class DataSource {
     updateAmount: number,
     categoryId: number,
   ): Promise<void> {
-    console.log(updateAmount)
-    console.log(categoryId)
+    console.log(updateAmount);
+    console.log(categoryId);
     await db.runAsync(
       `UPDATE ${scoreBoardTableName} SET score = ? WHERE category_id = ?`,
       [updateAmount, categoryId],

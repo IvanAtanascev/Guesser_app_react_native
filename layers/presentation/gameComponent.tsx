@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import Picture from "../domain/entities/picture";
 import { UpdateScoreUseCase } from "../application/usecases/updatescoreusecase";
 import { GetScoreUseCase } from "../application/usecases/getscoreusecase";
+import * as Haptics from "expo-haptics";
 
 class GameComponentError extends Error {
   constructor(message: string) {
@@ -42,6 +43,7 @@ export default function GameComponent({ categoryId }: { categoryId: number }) {
       Alert.alert("Correct!", "You selected the correct answer.", [
         { text: "Next", onPress: loadNewQuestion },
       ]);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setScore(score + 1);
     } else {
       const previousHighScore = await getScore.execute(categoryId);
@@ -49,7 +51,7 @@ export default function GameComponent({ categoryId }: { categoryId: number }) {
       if (previousHighScore < score) {
         await updateScore.execute(score, categoryId);
       }
-
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setScore(0);
     }
   };
@@ -75,7 +77,9 @@ export default function GameComponent({ categoryId }: { categoryId: number }) {
         {pictures.map((picture, index) => (
           <View key={index} style={styles.cardContainer}>
             <TouchableOpacity
-              onPress={() => handleAnswerSelection(index)}
+              onPress={() => {
+                handleAnswerSelection(index);
+              }}
               style={styles.overlay}
             >
               <Image
@@ -84,8 +88,8 @@ export default function GameComponent({ categoryId }: { categoryId: number }) {
                 }}
                 style={{
                   padding: 5,
-                  height: 150,
-                  width: 200,
+                  height: 120,
+                  width: 180,
                 }}
               />
             </TouchableOpacity>
@@ -104,8 +108,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   cardContainer: {
-    width: 200,
-    height: 150,
+    width: 180,
+    height: 120,
     padding: 5,
     position: "relative",
     backgroundColor: "rgba(0, 0, 0, 0)",

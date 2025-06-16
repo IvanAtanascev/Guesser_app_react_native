@@ -9,5 +9,6 @@ export default interface CategoryRepository {
   getSingleLocalCategory(id: number): Promise<Category>;
   getAllAvailableCategoryIds(): Promise<number[]>;
   getAllCategoryInfo(): Promise<Category[]>;
+  deleteCategory(name: string): Promise<void>;
   exists(id: number): Promise<boolean>;
 }
